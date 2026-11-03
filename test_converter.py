@@ -3,8 +3,6 @@ from converter import Converter
 
 
 class TestConverterPositiveLarge(unittest.TestCase):
-    """Тесты для диапазона x >= 100.7 -> возвращает 1000."""
-
     def test_exact_boundary_100_7(self):
         self.assertEqual(Converter.do(100.7), 1000)
 
@@ -19,8 +17,6 @@ class TestConverterPositiveLarge(unittest.TestCase):
 
 
 class TestConverterPositiveRange(unittest.TestCase):
-    """Тесты для диапазона 0 < x < 100.7 -> возвращает int(x)."""
-
     def test_just_below_boundary_100_6(self):
         self.assertEqual(Converter.do(100.6), 100)
 
@@ -41,8 +37,6 @@ class TestConverterPositiveRange(unittest.TestCase):
 
 
 class TestConverterZero(unittest.TestCase):
-    """Тесты для x == 0.0 -> генерируется ValueError."""
-
     def test_zero_raises_value_error(self):
         with self.assertRaises(ValueError):
             Converter.do(0.0)
@@ -53,8 +47,6 @@ class TestConverterZero(unittest.TestCase):
 
 
 class TestConverterNegativeRange(unittest.TestCase):
-    """Тесты для диапазона -30.4 <= x < 0 -> возвращает int(x) - 5."""
-
     def test_small_negative_minus_0_1(self):
         self.assertEqual(Converter.do(-0.1), -5)
 
@@ -75,8 +67,6 @@ class TestConverterNegativeRange(unittest.TestCase):
 
 
 class TestConverterNegativeLarge(unittest.TestCase):
-    """Тесты для диапазона x <= -30.5 -> возвращает -2000."""
-
     def test_exact_boundary_minus_30_5(self):
         self.assertEqual(Converter.do(-30.5), -2000)
 
