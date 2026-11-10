@@ -1,4 +1,4 @@
-import re
+import hashlib
 import sqlite3
 from typing import List, Dict, Optional
 
@@ -32,21 +32,19 @@ class ForumParser:
         soup = BeautifulSoup(html, "lxml")
         items: List[Dict[str, str]] = []
 
-        for block in soup.find_all("div", class_="c20-body"):
-            name_el = block.find("span", itemprop="name")
-            price_el = block.find("span", itemprop="offers")
-            if not name_el or not price_el:
+        for block in soup.find_all("div", class_="quote"):
+            author_el = block.find("small", class_="author")
+            text_el = block.find("span", class_="text")
+            if author_el is None or text_el is None:
                 continue
 
-            btn = block.find(attrs={"data-product-id": True})
-            if btn is None:
-                continue
-            comment_id = int(btn["data-product-id"])
+            author = author_el.get_text(strip=True)
+            message = text_el.decode_contents().strip()
 
             items.append({
-                "id": comment_id,
-                "name": name_el.get_text(strip=True),
-                "message": price_el.get_text(strip=True),
+                "id": self._stable_id(author, message),
+                "name": author,
+                "message": message,
             })
         return items
 
@@ -56,6 +54,11 @@ class ForumParser:
     def parse_file(self, filepath: str) -> List[Dict[str, str]]:
         with open(filepath, "r", encoding="utf-8") as f:
             return self.parse_html(f.read())
+
+    @staticmethod
+    def _stable_id(author: str, message: str) -> int:
+        digest = hashlib.md5(f"{author}::{message}".encode("utf-8")).hexdigest()
+        return int(digest[:12], 16)
 
     def save_to_db(self, parsed_data: List[Dict[str, str]], repository) -> int:
         saved = 0

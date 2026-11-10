@@ -4,10 +4,10 @@ import sys
 import requests
 
 
-URL = "https://sibdroid.ru/catalog/smartfony_samsung/"
+URL = "http://quotes.toscrape.com/"
 OUT = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    "tests", "fixtures", "sibdroid_samsung.html",
+    "tests", "fixtures", "quotes_fixture.html",
 )
 
 HEADERS = {
@@ -16,9 +16,7 @@ HEADERS = {
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/120.0.0.0 Safari/537.36"
     ),
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "ru-RU,ru;q=0.9,en;q=0.8",
-    "Referer": "https://sibdroid.ru/",
 }
 
 

@@ -6,7 +6,7 @@ from src.parser import ForumParser
 
 
 FIXTURE = os.path.join(
-    os.path.dirname(__file__), "fixtures", "sibdroid_samsung.html"
+    os.path.dirname(__file__), "fixtures", "quotes_fixture.html"
 )
 
 
@@ -46,6 +46,15 @@ class TestForumParser(unittest.TestCase):
 
     def test_headers_contain_user_agent(self):
         self.assertIn("User-Agent", self.parser.session.headers)
+
+    def test_debug_show_db(self):
+        posts = self.parser.parse_file(FIXTURE)
+        self.parser.save_to_db(posts, self.repo)
+        all_rows = self.repo.connection.execute("SELECT id, name, message FROM comments").fetchall()
+        print("\n--- Содержимое БД ---")
+        for row in all_rows:
+            print(dict(row))
+        print(f"Всего записей: {len(all_rows)}")
 
 
 if __name__ == "__main__":
