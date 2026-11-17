@@ -1,6 +1,4 @@
-import hashlib
 import sqlite3
-from typing import List, Dict, Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -16,51 +14,43 @@ class ForumParser:
         "Accept-Language": "ru-RU,ru;q=0.9,en;q=0.8",
     }
 
-    def __init__(self, headers: Optional[Dict[str, str]] = None, timeout: int = 10):
+    def __init__(self, headers=None, timeout=10):
         self.headers = headers or self.DEFAULT_HEADERS
         self.timeout = timeout
         self.session = requests.Session()
         self.session.headers.update(self.headers)
 
-    def fetch(self, url: str) -> str:
+    def fetch(self, url):
         response = self.session.get(url, timeout=self.timeout)
         response.raise_for_status()
         response.encoding = response.apparent_encoding or "utf-8"
         return response.text
 
-    def parse_html(self, html: str) -> List[Dict[str, str]]:
+    def parse_html(self, html):
         soup = BeautifulSoup(html, "lxml")
-        items: List[Dict[str, str]] = []
+        items = []
 
-        for block in soup.find_all("div", class_="quote"):
+        for idx, block in enumerate(soup.find_all("div", class_="quote"), start=1):
             author_el = block.find("small", class_="author")
             text_el = block.find("span", class_="text")
             if author_el is None or text_el is None:
                 continue
 
-            author = author_el.get_text(strip=True)
-            message = text_el.decode_contents().strip()
-
             items.append({
-                "id": self._stable_id(author, message),
-                "name": author,
-                "message": message,
+                "id": idx,
+                "name": author_el.get_text(strip=True),
+                "message": text_el.decode_contents().strip(),
             })
         return items
 
-    def parse_page(self, url: str) -> List[Dict[str, str]]:
+    def parse_page(self, url):
         return self.parse_html(self.fetch(url))
 
-    def parse_file(self, filepath: str) -> List[Dict[str, str]]:
+    def parse_file(self, filepath):
         with open(filepath, "r", encoding="utf-8") as f:
             return self.parse_html(f.read())
 
-    @staticmethod
-    def _stable_id(author: str, message: str) -> int:
-        digest = hashlib.md5(f"{author}::{message}".encode("utf-8")).hexdigest()
-        return int(digest[:12], 16)
-
-    def save_to_db(self, parsed_data: List[Dict[str, str]], repository) -> int:
+    def save_to_db(self, parsed_data, repository):
         saved = 0
         for item in parsed_data:
             try:

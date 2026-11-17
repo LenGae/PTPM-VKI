@@ -1,5 +1,4 @@
 import sqlite3
-from typing import Optional, List, Dict, Any
 
 
 class ValidationError(Exception):
@@ -10,13 +9,13 @@ class DatabaseRepository:
     MAX_NAME_LEN = 256
     MAX_MESSAGE_LEN = 8096
 
-    def __init__(self, db_path: str = ':memory:'):
+    def __init__(self, db_path=':memory:'):
         self.db_path = db_path
         self.connection = sqlite3.connect(db_path)
         self.connection.row_factory = sqlite3.Row
         self._create_table()
 
-    def _create_table(self) -> None:
+    def _create_table(self):
         with self.connection:
             self.connection.execute("""
                 CREATE TABLE IF NOT EXISTS comments (
@@ -27,7 +26,7 @@ class DatabaseRepository:
             """)
 
     @classmethod
-    def _validate_name(cls, username: str) -> None:
+    def _validate_name(cls, username):
         if not isinstance(username, str):
             raise ValidationError("name должен быть строкой")
         if not username or len(username) > cls.MAX_NAME_LEN:
@@ -36,7 +35,7 @@ class DatabaseRepository:
             )
 
     @classmethod
-    def _validate_message(cls, message: str) -> None:
+    def _validate_message(cls, message):
         if not isinstance(message, str):
             raise ValidationError("message должен быть строкой")
         if not message or len(message) > cls.MAX_MESSAGE_LEN:
@@ -45,11 +44,11 @@ class DatabaseRepository:
             )
 
     @staticmethod
-    def _validate_id(comment_id: int) -> None:
+    def _validate_id(comment_id):
         if not isinstance(comment_id, int) or isinstance(comment_id, bool):
             raise ValidationError("id должен быть целым числом")
 
-    def add(self, comment_id: int, username: str, message: str) -> bool:
+    def add(self, comment_id, username, message):
         self._validate_id(comment_id)
         self._validate_name(username)
         self._validate_message(message)
@@ -60,7 +59,7 @@ class DatabaseRepository:
             )
         return True
 
-    def get_by_id(self, comment_id: int) -> Optional[Dict[str, Any]]:
+    def get_by_id(self, comment_id):
         self._validate_id(comment_id)
         cursor = self.connection.execute(
             "SELECT id, name, message FROM comments WHERE id = ?", (comment_id,)
@@ -68,7 +67,7 @@ class DatabaseRepository:
         row = cursor.fetchone()
         return dict(row) if row else None
 
-    def get_by_name(self, username: str) -> List[Dict[str, Any]]:
+    def get_by_name(self, username):
         self._validate_name(username)
         cursor = self.connection.execute(
             "SELECT id, name, message FROM comments WHERE name = ? ORDER BY id",
@@ -76,7 +75,7 @@ class DatabaseRepository:
         )
         return [dict(row) for row in cursor.fetchall()]
 
-    def update(self, comment_id: int, new_message: str) -> bool:
+    def update(self, comment_id, new_message):
         self._validate_id(comment_id)
         self._validate_message(new_message)
         with self.connection:
@@ -86,7 +85,7 @@ class DatabaseRepository:
             )
         return cursor.rowcount > 0
 
-    def delete(self, comment_id: int) -> bool:
+    def delete(self, comment_id):
         self._validate_id(comment_id)
         with self.connection:
             cursor = self.connection.execute(
@@ -94,5 +93,5 @@ class DatabaseRepository:
             )
         return cursor.rowcount > 0
 
-    def close(self) -> None:
+    def close(self):
         self.connection.close()

@@ -9,7 +9,6 @@ FIXTURE = os.path.join(
     os.path.dirname(__file__), "fixtures", "quotes_fixture.html"
 )
 
-
 class TestForumParser(unittest.TestCase):
     def setUp(self):
         self.parser = ForumParser()
