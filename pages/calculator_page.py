@@ -1,3 +1,4 @@
+import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
@@ -12,7 +13,6 @@ class CalculatorPage:
     _OPERATOR = (By.ID, "selectOperationDropdown")
     _RESULT = (By.ID, "numberAnswerField")
     _CALCULATE_BTN = (By.ID, "calculateButton")
-    _CLEAR_BTN = (By.ID, "clearButton")
 
     def __init__(self, driver):
         self.driver = driver
@@ -28,21 +28,25 @@ class CalculatorPage:
         field = self.driver.find_element(*self._FIRST_NUMBER)
         field.clear()
         field.send_keys(str(value))
+        time.sleep(0.5)
         return self
 
     def enter_second_number(self, value):
         field = self.driver.find_element(*self._SECOND_NUMBER)
         field.clear()
         field.send_keys(str(value))
+        time.sleep(0.5)
         return self
 
     def select_operation(self, op_value):
         dropdown = Select(self.driver.find_element(*self._OPERATOR))
         dropdown.select_by_value(str(op_value))
+        time.sleep(0.5)
         return self
 
     def click_calculate(self):
         self.driver.find_element(*self._CALCULATE_BTN).click()
+        time.sleep(1.5)
         return self
 
     def get_result(self):
