@@ -10,8 +10,6 @@ class TestCalculator(unittest.TestCase):
     def setUpClass(cls):
         opts = Options()
         opts.add_argument("--headless=new")
-        opts.add_argument("--no-sandbox")
-        opts.add_argument("--disable-dev-shm-usage")
         cls.driver = webdriver.Chrome(options=opts)
 
     @classmethod
